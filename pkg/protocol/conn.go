@@ -81,16 +81,16 @@ type RUDPConn struct {
 }
 
 // DialRUDP client dial server, building a relieable connection
-func DialRUDP(localAddr, remoteAddr *net.UDPAddr) (*RUDPConn, error) {
+func DialRUDP(conn *net.UDPConn, remoteAddr *net.UDPAddr) (*RUDPConn, error) {
 	c := &RUDPConn{}
-	c.localAddr = localAddr
+	c.localAddr = nil
 	c.remoteAddr = remoteAddr
 	c.rudpConnType = connTypeClient
 	c.sendSeqNumber = 0
 	c.recvPacketChannel = make(chan *packet, 1<<5)
 	c.rudpConnStatus = connStatusConnecting
 
-	if err := c.clientBuildConn(); err != nil {
+	if err := c.clientBuildConn(conn); err != nil {
 		return nil, err
 	}
 
@@ -283,11 +283,7 @@ func (c *RUDPConn) SetSendTick(nano int32) {
 }
 
 func (c *RUDPConn) write(data []byte) (n int, err error) {
-	if c.rudpConnType == connTypeServer {
-		n, err = c.rawUDPConn.WriteTo(data, c.remoteAddr)
-	} else {
-		n, err = c.rawUDPConn.Write(data)
-	}
+	n, err = c.rawUDPConn.WriteTo(data, c.remoteAddr)
 	return
 }
 
@@ -311,19 +307,15 @@ func (c *RUDPConn) sendPacket() {
 	}
 }
 
-func (c *RUDPConn) clientBuildConn() error {
+func (c *RUDPConn) clientBuildConn(udpConn *net.UDPConn) error {
 	// just init instance
-	udpConn, err := net.DialUDP("udp", c.localAddr, c.remoteAddr)
-	if err != nil {
-		return err
-	}
 	c.rawUDPConn = udpConn
 	c.rawUDPConn.SetWriteBuffer(65528)
 	// send conn segment
 	connSeqNb := c.sendSeqNumber
 	c.sendSeqNumber++
 	connSegment := newConPacket(connSeqNb).marshal()
-	n, err := udpConn.Write(connSegment)
+	n, err := udpConn.WriteTo(connSegment, c.remoteAddr)
 	if err != nil {
 		return err
 	}
