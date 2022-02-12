@@ -14,20 +14,15 @@ type RUDPListener struct {
 	err          chan error
 }
 
-func ListenRUDP(localAddr *net.UDPAddr) (*RUDPListener, error) {
-	udpConn, err := net.ListenUDP("udp", localAddr)
-	if err != nil {
-		return nil, err
-	}
-
+func ListenRUDP(conn *net.UDPConn) *RUDPListener {
 	listener := &RUDPListener{
-		listenConn:   udpConn,
+		listenConn:   conn,
 		peerMap:      &sync.Map{},
 		err:          make(chan error, 1),
 		newConnQueue: make(chan *RUDPConn, 1<<10),
 	}
 	go listener.listen()
-	return listener, nil
+	return listener
 }
 
 func (l *RUDPListener) Accept() (net.Conn, error) {

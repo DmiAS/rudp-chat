@@ -13,11 +13,20 @@ const network = "udp"
 
 func main() {
 	protocol.Debug()
-	listener, err := protocol.ListenRUDP(
-		&net.UDPAddr{
-			Port: 9000,
-		},
-	)
+	laddr, err := net.ResolveUDPAddr(network, "localhost:9000")
+	if err != nil {
+		panic(err)
+	}
+	conn, err := net.ListenUDP(network, laddr)
+	if err != nil {
+		panic(err)
+	}
+	// listener, err := protocol.ListenRUDP(
+	// 	&net.UDPAddr{
+	// 		Port: 9000,
+	// 	},
+	// )
+	listener := protocol.ListenRUDP(conn)
 
 	if err != nil {
 		log.Fatalf("rudp.ListenRUDP error: %v", err)
