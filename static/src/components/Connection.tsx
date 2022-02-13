@@ -1,33 +1,52 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { User } from "../interfaces/core"
-import { Chat } from "./Chat"
 import { Loader } from "./Loader"
 import { UserComp } from "./UserComp"
+import axios from "axios"
+import { Chat } from "./Chat"
 
 type ConnectionProps = {
     users: User[]
     isLoading: boolean
 }
 
-
 export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
     const [connected, setConnected] = React.useState(false)
     const [isChatLoading, setIsChatLoading] = React.useState(false)
-    const [chosen, setChosen] = React.useState({name: '', id: -1})
+    const [chosen, setChosen] = React.useState({ name: '', id: -1 })
+    const [address, setAddress] = React.useState("")
 
-    const onClickConnect = (user: User) => {
+    useEffect(() => {
+        let new_uri = "ws://" + window.location.host + "/ws/chat/thread"
+        console.log(new_uri)
+        let ws = new WebSocket(new_uri)
+        ws.onopen = (event) => {
+            ws.send(JSON.stringify({ "address": address, "action": "start" }))
+        }
+    }, [address])
+
+    const onClickConnect = async (user: User) => {
+        console.log(user.name)
         setIsChatLoading(true)
-        setTimeout(() => {
-            setConnected(true)
-            setChosen(user)
-            setIsChatLoading(false)
-        }, 5000)
+        const resp = await axios.post(`/api/v1/connect/${user.name}`)
+        if (resp.status !== 200) {
+            window.alert(`${resp.data.msg}`)
+            return
+        }
+        setIsChatLoading(false)
+        setAddress(resp.data["address"])
+        // setIsChatLoading(false)
+        // setTimeout(() => {
+        //     setConnected(true)
+        //     setChosen(user)
+        //     setIsChatLoading(false)
+        // }, 5000)
     }
 
     const onClickEnd = (user: User) => {
         setTimeout(() => {
             setConnected(false)
-            setChosen({name: '', id: -1})
+            setChosen({ name: '', id: -1 })
         }, 2000)
     }
 
@@ -41,7 +60,7 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
                     {users.map(user => {
                         return (
                             <UserComp user={user} onClickConnect={onClickConnect}
-                            onClickEnd={onClickEnd} chosen={chosen} connected={connected} />
+                                onClickEnd={onClickEnd} chosen={chosen} connected={connected} />
                         )
                     })}
                 </div>

@@ -36,6 +36,7 @@ func (s *Server) chatThread(c *websocket.Conn) {
 		log.Debug().Msgf("message  type = %d", mt)
 
 		if err := s.handleChat(msg); err != nil {
+			log.Debug().Err(err).Msg("something in socket")
 			if err := c.WriteJSON(model.ErrResponse{Msg: err.Error()}); err != nil {
 				log.Debug().Err(err).Msg("failure to send json via socket")
 			}
@@ -49,6 +50,7 @@ func (s *Server) handleChat(data []byte) error {
 		return fmt.Errorf("failure to unmarshal chat action")
 	}
 
+	log.Debug().Msgf("value = %+v", event)
 	switch action := event.Action; action {
 	case startChat:
 		if err := s.manager.Connect(event.Address); err != nil {

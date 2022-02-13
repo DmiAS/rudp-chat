@@ -1,6 +1,9 @@
 package server
 
-import "github.com/gofiber/websocket/v2"
+import (
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/websocket/v2"
+)
 
 const (
 	// http
@@ -17,13 +20,16 @@ const (
 )
 
 func (s *Server) initRoutes() {
-	s.app.Use(upgradeWesocket)
-
-	s.app.Post(apiPath+registerPath+"/:"+clientName, s.register)
-	s.app.Post(apiPath+connectPath+"/:"+clientName, s.connect)
-	chat := s.app.Group(websocketPath + chatPath)
+	// serve html for gui
+	s.app.Static("/", "/Users/d.antsibor/university/network/course/chat/static/build")
+	api := s.app.Group(apiPath).Use(cors.New())
 	{
-		chat.Get("/", websocket.New(s.chatThread))
+		api.Post(registerPath+"/:"+clientName, s.register)
+		api.Post(connectPath+"/:"+clientName, s.connect)
+	}
+	chat := s.app.Group(websocketPath + chatPath).Use(upgradeWesocket)
+	{
+		chat.Get("/thread", websocket.New(s.chatThread))
 		chat.Get(messagePath, websocket.New(s.workWithMessages))
 		chat.Get(filesPath, websocket.New(s.workWithFiles))
 	}
