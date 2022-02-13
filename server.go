@@ -2,14 +2,12 @@ package rudp
 
 import (
 	"context"
-	"crypto/sha1"
 	"fmt"
 	"net"
 
 	"github.com/rs/zerolog/log"
 
 	"github.com/xtaci/kcp-go"
-	"golang.org/x/crypto/pbkdf2"
 )
 
 type Server struct {
@@ -19,11 +17,9 @@ type Server struct {
 }
 
 func NewServer(conn net.PacketConn) (*Server, error) {
-	// generate key to secure connection for kcp
-	key := pbkdf2.Key([]byte(pass), []byte(salt), iter, keyLen, sha1.New)
-	block, err := kcp.NewAESBlockCrypt(key)
+	block, err := createBlock()
 	if err != nil {
-		return nil, fmt.Errorf("failure to create aes block: %s", err)
+		return nil, err
 	}
 	l, err := kcp.ServeConn(block, dataShards, parityShards, conn)
 	if err != nil {
