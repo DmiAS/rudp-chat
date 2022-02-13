@@ -14,7 +14,7 @@ function App() {
             return {name: elem, id: Date.now()}
         })
 
-        setUsers(prev => [...newMas, ...prev])
+        setUsers(prev => [...newMas])
     }
 
     React.useEffect(() => {

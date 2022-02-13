@@ -1,7 +1,8 @@
 import React from "react"
-import { User } from "../interfaces/core"
-import { Loader } from "./Loader"
-import { UserComp } from "./UserComp"
+import {User} from "../interfaces/core"
+import {Loader} from "./Loader"
+import {UserComp} from "./UserComp"
+import axios from "axios"
 
 type ConnectionProps = {
     users: User[]
@@ -9,12 +10,18 @@ type ConnectionProps = {
 }
 
 
-export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
+export const Connection: React.FC<ConnectionProps> = ({users, isLoading}) => {
     const [connected, setConnected] = React.useState(false)
     const [isChatLoading, setIsChatLoading] = React.useState(false)
     const [chosen, setChosen] = React.useState({name: '', id: -1})
 
-    const onClickConnect = (user: User) => {
+    const onClickConnect = async (user: User) => {
+        console.log(user.name)
+        const resp = await axios.post(`/api/v1/connect/${user.name}`)
+        if (resp.status !== 200) {
+            window.alert(`${resp.data.msg}`)
+            return
+        }
         setIsChatLoading(true)
         setTimeout(() => {
             setConnected(true)
@@ -32,7 +39,7 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
 
 
     return isLoading ? (
-        <Loader />
+        <Loader/>
     ) : (
         <div className="main-view-container">
             <div className="users-container">
@@ -40,7 +47,7 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
                     {users.map(user => {
                         return (
                             <UserComp user={user} onClickConnect={onClickConnect}
-                            onClickEnd={onClickEnd} chosen={chosen} connected={connected} />
+                                      onClickEnd={onClickEnd} chosen={chosen} connected={connected}/>
                         )
                     })}
                 </div>
@@ -48,7 +55,7 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
 
             <div className="chat-container">
                 {isChatLoading
-                    ? <Loader />
+                    ? <Loader/>
                     : <div></div>
                 }
             </div>

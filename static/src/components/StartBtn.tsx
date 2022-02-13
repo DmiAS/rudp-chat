@@ -20,6 +20,7 @@ export const StartBtn: React.FC<Props> = props => {
         const result = await axios.post(`/api/v1/register/${value}`)
         if (result.status !== 200) {
             window.alert(`${result.data.msg}`)
+            return
         }
 
         // !!! Зачекать потом
@@ -30,7 +31,7 @@ export const StartBtn: React.FC<Props> = props => {
 
         props.namesHandler(names)
 
-        props.namesHandler(["Dima", "masha", "pasha"])
+        // props.namesHandler(["Dima", "masha", "pasha"])
 
         navigate('/connect')
     }
