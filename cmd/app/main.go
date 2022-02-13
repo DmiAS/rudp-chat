@@ -3,10 +3,15 @@ package main
 import (
 	"context"
 	"flag"
+	"os"
+	"os/signal"
 
 	"github.com/DmiAS/rendezvous/pkg/proto/client"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/rs/zerolog/pkgerrors"
+
+	"chat/internal/server"
 )
 
 const (
@@ -17,6 +22,7 @@ func main() {
 	var clientPort string
 	var rendezvous string
 	var debug bool
+
 	// default port for udp is 0 cause in this case it will be chosen automatically
 	flag.BoolVar(&debug, "debug", false, "debug level for logging")
 	flag.StringVar(&clientPort, "port", "0", "port to run udp")
@@ -34,9 +40,26 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer cli.Close()
 
-	// init server for static
+	// init server
+	srv := server.NewServer(cli)
 
+	// gracefully shutdown
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Kill, os.Interrupt)
+	go srv.Run()
+	<-quit
+
+	log.Info().Msg("server shutting down")
+	if err := srv.Shutdown(); err != nil {
+		log.Fatal().
+			Err(err).
+			Msg("failure to shutdown server")
+	}
+
+	log.Info().
+		Msg("server stopped")
 }
 
 func setupLogger(debug bool) {
