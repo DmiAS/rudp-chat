@@ -53,3 +53,13 @@ func (s *Server) Run() {
 func (s *Server) Shutdown() error {
 	return s.app.Shutdown()
 }
+
+func (s *Server) listenSignal() {
+	for {
+		// wait for signal that we should create manager as server not client
+		<-s.cli.GetSignalChan()
+		if err := s.manager.StartServer(); err != nil {
+			log.Error().Err(err).Msg("failure to start server")
+		}
+	}
+}

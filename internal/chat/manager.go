@@ -31,7 +31,21 @@ type Manager struct {
 }
 
 func NewManager(conn net.PacketConn) *Manager {
-	return &Manager{conn: conn, quit: make(chan struct{})}
+	return &Manager{
+		filesChan:    make(chan []byte, chanSize),
+		messagesChan: make(chan []byte, chanSize),
+		conn:         conn,
+		quit:         make(chan struct{}),
+	}
+}
+
+func (m *Manager) StartServer() error {
+	srv, err := rudp.NewServer(m.conn)
+	if err != nil {
+		return fmt.Errorf("failure to create rudp server: %s", err)
+	}
+	m.run(srv)
+	return nil
 }
 
 func (m *Manager) Connect(addr string) error {
@@ -39,11 +53,14 @@ func (m *Manager) Connect(addr string) error {
 	if err != nil {
 		return fmt.Errorf("failure to create rudp client: %s", err)
 	}
-	// run client in separate goroutine
-	m.engine = cli
+	m.run(cli)
+	return nil
+}
+
+func (m *Manager) run(engine Engine) {
+	m.engine = engine
 	go m.listen()
 	go m.spin()
-	return nil
 }
 
 func (m *Manager) spin() {
