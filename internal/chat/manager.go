@@ -58,6 +58,7 @@ func (m *Manager) Disconnect() {
 	m.quit <- struct{}{}
 }
 
+// listens for incoming packets and send it to appropriate channels
 func (m *Manager) listen() {
 	for {
 		data := <-m.engine.Receive()

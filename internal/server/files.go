@@ -54,7 +54,7 @@ func (s *Server) writeFiles(c *websocket.Conn) {
 		} else {
 			fileCnt++
 			// send path to file to gui
-			if err := c.WriteMessage(websocket.BinaryMessage, msg); err != nil {
+			if err := c.WriteMessage(websocket.TextMessage, []byte(fileName)); err != nil {
 				log.Error().Err(err).Msgf("failure to write message to websocket")
 			}
 		}
