@@ -20,7 +20,7 @@ type Server struct {
 }
 
 const (
-	serverAddress = "localhost"
+	serverAddress = "localhost:8080"
 )
 
 func NewServer(cli *client.Client) *Server {

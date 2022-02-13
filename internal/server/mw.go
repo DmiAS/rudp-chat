@@ -8,7 +8,7 @@ import (
 func upgradeWesocket(ctx *fiber.Ctx) error {
 	// IsWebSocketUpgrade returns true if the client
 	// requested upgrade to the WebSocket protocol.
-	if websocket.IsWebSocketUpgrade(c) {
+	if websocket.IsWebSocketUpgrade(ctx) {
 		ctx.Locals("allowed", true)
 		return ctx.Next()
 	}
