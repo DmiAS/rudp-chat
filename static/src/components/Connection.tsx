@@ -1,4 +1,4 @@
-import React from "react"
+import React, {useEffect} from "react"
 import {User} from "../interfaces/core"
 import {Loader} from "./Loader"
 import {UserComp} from "./UserComp"
@@ -9,25 +9,37 @@ type ConnectionProps = {
     isLoading: boolean
 }
 
-
 export const Connection: React.FC<ConnectionProps> = ({users, isLoading}) => {
     const [connected, setConnected] = React.useState(false)
     const [isChatLoading, setIsChatLoading] = React.useState(false)
     const [chosen, setChosen] = React.useState({name: '', id: -1})
+    const [address, setAddress] = React.useState("")
+
+    useEffect( () => {
+        let new_uri = "ws://" + window.location.host + "/ws/chat/thread"
+        console.log(new_uri)
+        let ws = new WebSocket(new_uri)
+        ws.onopen = (event) => {
+            ws.send(JSON.stringify({"address": address, "action": "start"}))
+        }
+    }, [address])
 
     const onClickConnect = async (user: User) => {
         console.log(user.name)
+        setIsChatLoading(true)
         const resp = await axios.post(`/api/v1/connect/${user.name}`)
         if (resp.status !== 200) {
             window.alert(`${resp.data.msg}`)
             return
         }
-        setIsChatLoading(true)
-        setTimeout(() => {
-            setConnected(true)
-            setChosen(user)
-            setIsChatLoading(false)
-        }, 5000)
+        setIsChatLoading(false)
+        setAddress(resp.data["address"])
+        // setIsChatLoading(false)
+        // setTimeout(() => {
+        //     setConnected(true)
+        //     setChosen(user)
+        //     setIsChatLoading(false)
+        // }, 5000)
     }
 
     const onClickEnd = (user: User) => {

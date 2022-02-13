@@ -29,7 +29,7 @@ func (s *Server) initRoutes() {
 	}
 	chat := s.app.Group(websocketPath + chatPath).Use(upgradeWesocket)
 	{
-		chat.Get("/", websocket.New(s.chatThread))
+		chat.Get("/thread", websocket.New(s.chatThread))
 		chat.Get(messagePath, websocket.New(s.workWithMessages))
 		chat.Get(filesPath, websocket.New(s.workWithFiles))
 	}

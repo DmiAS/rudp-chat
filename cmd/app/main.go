@@ -26,7 +26,7 @@ func main() {
 	var debug bool
 
 	// default port for udp is 0 cause in this case it will be chosen automatically
-	flag.BoolVar(&debug, "debug", false, "debug level for logging")
+	flag.BoolVar(&debug, "debug", true, "debug level for logging")
 	flag.StringVar(&clientPort, "port", "0", "port to run udp")
 	flag.StringVar(&rendezvous, "stun", defaultRendezvous, "rendezvous server address")
 	flag.StringVar(&serverPort, "sp", defaultServerPort, "http server port")
