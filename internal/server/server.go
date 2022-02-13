@@ -8,12 +8,15 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/rs/zerolog/log"
+
+	"chat/internal/chat"
 )
 
 type Server struct {
 	hostAddress string
 	app         *fiber.App
 	cli         *client.Client
+	manager     *chat.Manager
 }
 
 const (
@@ -24,6 +27,7 @@ func NewServer(cli *client.Client) *Server {
 	srv := &Server{
 		cli:         cli,
 		hostAddress: serverAddress,
+		manager:     chat.NewManager(cli.GetConnection()),
 	}
 	srv.app = fiber.New(
 		fiber.Config{
