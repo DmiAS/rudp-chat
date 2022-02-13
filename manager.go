@@ -13,10 +13,10 @@ type Manager struct {
 	session  *kcp.UDPSession
 }
 
-func NewManager(session *kcp.UDPSession) *Manager {
+func NewManager(session *kcp.UDPSession, recv, send chan []byte) *Manager {
 	return &Manager{
-		recvChan: make(chan []byte, recvChanSize),
-		sendChan: make(chan []byte, sendChanSize),
+		recvChan: recv,
+		sendChan: send,
 		session:  session,
 	}
 }
@@ -27,7 +27,7 @@ func (m *Manager) Write(ctx context.Context) {
 		case <-ctx.Done():
 			log.Debug().Msg("stop reading from session: context expired")
 		default:
-			data := make([]byte, buffSize)
+			data := make([]byte, bufferSize)
 			n, err := m.session.Read(data)
 			if err != nil {
 				log.Error().Err(err).Msg("failure to read from session")
