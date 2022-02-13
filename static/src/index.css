@@ -50,8 +50,8 @@ code {
 
 .users-container {
     border-right: 4px solid #666;
-    width: 330px;
     display: flex;
+    padding-right: 30px;
 }
 
 .users-wrapper {
@@ -77,4 +77,23 @@ code {
     width: 170px;
     display: flex;
     justify-content: space-between;
+}
+
+.chat-container {
+    width: 100%;
+}
+
+.chat-loader-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chat-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }

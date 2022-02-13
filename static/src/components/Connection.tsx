@@ -1,5 +1,6 @@
 import React from "react"
 import { User } from "../interfaces/core"
+import { Chat } from "./Chat"
 import { Loader } from "./Loader"
 import { UserComp } from "./UserComp"
 
@@ -27,7 +28,7 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
         setTimeout(() => {
             setConnected(false)
             setChosen({name: '', id: -1})
-        }, 5000)
+        }, 2000)
     }
 
 
@@ -48,8 +49,12 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
 
             <div className="chat-container">
                 {isChatLoading
-                    ? <Loader />
-                    : <div></div>
+                    ? <div className="chat-loader-wrapper">
+                        <Loader />
+                    </div>
+                    : <div className="chat-wrapper">
+                        <Chat />
+                    </div>
                 }
             </div>
         </div>
