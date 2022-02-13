@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	defaultRendezvous = "localhost:10000"
+	defaultRendezvous = "localhost:9000"
 )
 
 func main() {
