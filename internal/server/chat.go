@@ -20,6 +20,7 @@ const (
 	stopChat  = "stop"
 )
 
+// handle messages for connecting go clients
 func (s *Server) chatThread(c *websocket.Conn) {
 	var (
 		mt  int
@@ -60,4 +61,25 @@ func (s *Server) handleChat(data []byte) error {
 	}
 
 	return nil
+}
+
+func (s *Server) workWithMessages(c *websocket.Conn) {
+	var (
+		mt  int
+		msg []byte
+		err error
+	)
+	for {
+		if mt, msg, err = c.ReadMessage(); err != nil {
+			log.Debug().Err(err).Msg("read from socket error")
+			break
+		}
+		log.Debug().Msgf("receive %d bytes from chat thread", len(msg))
+		log.Debug().Msgf("message  type = %d", mt)
+
+	}
+}
+
+func (s *Server) workWithFiles(c *websocket.Conn) {
+
 }
