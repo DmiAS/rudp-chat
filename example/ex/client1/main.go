@@ -49,14 +49,28 @@ func read(conn *kcp.Listener) {
 }
 
 func handle(s *kcp.UDPSession) {
+	go readSession(s)
+	writeSession(s)
+}
+
+func readSession(s *kcp.UDPSession) {
 	for {
-		data := make([]byte, 1024)
+		<-time.After(time.Second)
+		data := make([]byte, 512)
 		n, err := s.Read(data)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("can not read", err)
 		}
-		fmt.Println(string(data[:n]))
-		s.Write([]byte("pong"))
+		fmt.Println("readed data: ", string(data[:n]))
+	}
+}
+
+func writeSession(s *kcp.UDPSession) {
+	for {
+		<-time.After(time.Second)
+		if _, err := s.Write([]byte("pinging from server")); err != nil {
+			fmt.Println("err = ", err)
+		}
 	}
 }
 
