@@ -34,46 +34,14 @@ func (s *Server) Close() error {
 	return s.listener.Close()
 }
 
-func (s *Server) Listen(ctx context.Context) {
+func (s *Server) Start(ctx context.Context) {
 	// we wait only for one connection thus we should not do it in loop
 	conn, err := s.listener.AcceptKCP()
 	if err != nil {
 		log.Error().Err(err).Msg("failure to accept connection")
 	}
-	go s.read(ctx, conn)
-	go s.write(ctx, conn)
+	m := NewManager(conn)
+	go m.Read(ctx)
+	go m.Write(ctx)
 	<-ctx.Done()
-}
-
-func (s *Server) read(ctx context.Context, session *kcp.UDPSession) {
-	for {
-		select {
-		case <-ctx.Done():
-			log.Debug().Msg("stop reading from session: context expired")
-		default:
-			data := make([]byte, buffSize)
-			n, err := session.Read(data)
-			if err != nil {
-				log.Error().Err(err).Msg("failure to read from session in server")
-			} else {
-				log.Debug().Msg("sending data to receive channel")
-				s.recvChan <- data[:n]
-			}
-		}
-	}
-}
-
-func (s *Server) write(ctx context.Context, session *kcp.UDPSession) {
-	for {
-		select {
-		case <-ctx.Done():
-			log.Debug().Msg("stop reading from session: context expired")
-		case data := <-s.sendChan:
-			n, err := session.Write(data)
-			if err != nil {
-				log.Error().Err(err).Msgf("failure to write data(%d) to session in server", len(data))
-			}
-			log.Debug().Msgf("send %d bytes to session in server", n)
-		}
-	}
 }

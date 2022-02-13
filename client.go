@@ -1,6 +1,7 @@
 package rudp
 
 import (
+	"context"
 	"fmt"
 	"net"
 
@@ -25,4 +26,16 @@ func NewClient(conn net.PacketConn, raddr string) (*Client, error) {
 		return nil, fmt.Errorf("failure to initate kcp connection: %s", err)
 	}
 	return &Client{c: c}, nil
+}
+
+func (c *Client) Start(ctx context.Context) {
+	m := NewManager(c.c)
+	go m.Read(ctx)
+	go m.Write(ctx)
+	// wait for interrupt
+	<-ctx.Done()
+}
+
+func (c *Client) Close() error {
+	return c.c.Close()
 }
