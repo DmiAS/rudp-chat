@@ -16,17 +16,21 @@ import (
 
 const (
 	defaultRendezvous = "localhost:9000"
+	defaultServerPort = "8080"
 )
 
 func main() {
 	var clientPort string
 	var rendezvous string
+	var serverPort string
 	var debug bool
 
 	// default port for udp is 0 cause in this case it will be chosen automatically
 	flag.BoolVar(&debug, "debug", false, "debug level for logging")
 	flag.StringVar(&clientPort, "port", "0", "port to run udp")
 	flag.StringVar(&rendezvous, "stun", defaultRendezvous, "rendezvous server address")
+	flag.StringVar(&serverPort, "sp", defaultServerPort, "http server port")
+	flag.Parse()
 
 	// setup logger
 	setupLogger(debug)
@@ -43,7 +47,7 @@ func main() {
 	defer cli.Close()
 
 	// init server
-	srv := server.NewServer(cli)
+	srv := server.NewServer(cli, serverPort)
 
 	// gracefully shutdown
 	quit := make(chan os.Signal)

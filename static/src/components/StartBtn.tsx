@@ -16,7 +16,8 @@ export const StartBtn: React.FC<Props> = props => {
 
     const textHandler = async () => {
         const value = ref.current!.value
-        const result = await axios.post(`http://localhost:8080/api/v1/register/${value}`)
+        // const result = await axios.post(`http://localhost:8080/api/v1/register/${value}`)
+        const result = await axios.post(`/api/v1/register/${value}`)
         if (result.status !== 200) {
             window.alert(`${result.data.msg}`)
         }

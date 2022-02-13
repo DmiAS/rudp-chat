@@ -20,13 +20,13 @@ type Server struct {
 }
 
 const (
-	serverAddress = "localhost:8080"
+	serverAddress = "localhost"
 )
 
-func NewServer(cli *client.Client) *Server {
+func NewServer(cli *client.Client, port string) *Server {
 	srv := &Server{
 		cli:         cli,
-		hostAddress: serverAddress,
+		hostAddress: serverAddress + ":" + port,
 		manager:     chat.NewManager(cli.GetConnection()),
 	}
 	srv.app = fiber.New(

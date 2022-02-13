@@ -20,6 +20,8 @@ const (
 )
 
 func (s *Server) initRoutes() {
+	// serve html for gui
+	s.app.Static("/", "/Users/d.antsibor/university/network/course/chat/static/build")
 	api := s.app.Group(apiPath).Use(cors.New())
 	{
 		api.Post(registerPath+"/:"+clientName, s.register)
