@@ -32,13 +32,13 @@ func (s *Server) chatThread(c *websocket.Conn) {
 					log.Debug().Err(err).Msg("failure to send json via socket")
 				}
 			}
-		case <-s.cli.GetSignalChan():
+		case name := <-s.cli.GetSignalChan():
 			log.Debug().Msg("received signal")
 			if err := s.manager.StartServer(); err != nil {
 				log.Error().Err(err).Msg("failure to start server")
 				continue
 			}
-			if err := c.WriteMessage(websocket.TextMessage, []byte("ping")); err != nil {
+			if err := c.WriteMessage(websocket.TextMessage, name); err != nil {
 				log.Error().Err(err).Msg("failure to send ping message to server")
 				continue
 			}
