@@ -1,6 +1,6 @@
 import { AppBar, Box } from '@material-ui/core'
 import { report } from 'process'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Msg, User } from '../interfaces/core'
 import { ChatFooter } from './ChatFooter'
 import { ChatHeader } from './ChatHeader'
@@ -12,6 +12,16 @@ type Props = {
 }
 
 export const Chat: React.FC<Props> = ({ user, msgs }) => {
+    const [messages, setMessages] = React.useState<Msg[]>([])
+
+    const msgHandler = (msg: Msg) => {
+        setMessages(prev => [...prev, msg])
+    }
+
+    React.useEffect(() => {
+        setMessages(prev => [...prev, ...msgs])
+    }, [])
+
     return (
         <>
             <div className="chat-header">
@@ -19,11 +29,11 @@ export const Chat: React.FC<Props> = ({ user, msgs }) => {
             </div>
 
             <div className="chat-msg">
-                <ChatMsg msgs={msgs}/>
+                <ChatMsg msgs={messages}/>
             </div>
 
             <div className="chat-footer">
-                <ChatFooter />
+                <ChatFooter msgHandler={msgHandler}/>
             </div>
         </>
     )

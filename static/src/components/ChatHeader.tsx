@@ -17,7 +17,7 @@ export const ChatHeader: React.FC<Props> = ({ user }) => {
                         <div style={{color: "#FFFFF0"}}>
                             Dialog to {user.name}
                         </div>
-                    </Typography>
+                    </Typography> 
                 </Toolbar>
             </AppBar>
         </Box>

@@ -11,6 +11,7 @@ type ConnectionProps = {
     isLoading: boolean
 }
 
+//! МОКИ. Тут должно быть получение сообщений из сокета
 const msgs: Msg[] = [{text: "Привет"}, {text: "1234123412341234123412341234", fromMe: true}]
 
 export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
