@@ -21,6 +21,7 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
     const [address, setAddress] = React.useState("")
     const [messages, setMessages] = React.useState<Msg[]>([])
     const [msgSocket, setSocket] = React.useState<WebSocket>()
+    const [fileSocket, setFileSocket] = React.useState<WebSocket>()
     const [name, setName] = React.useState<string>("")
 
     useEffect( () => {
@@ -52,18 +53,18 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
     }, [])
 
     useEffect(() => {
-        // connect ot files websocket
+        // connect to files websocket
         let new_uri = "ws://" + window.location.host + "/ws/chat/files"
         console.log(new_uri)
         let socket = new WebSocket(new_uri)
         socket.onmessage = (event) => {
-
+            console.log(event, "!@$$%")
             const file = axios.get(`/files/${event.data}`) // get file from storage
-            
+
             console.log(`received file path = ${event.data}`)
             // setMessages([{text: event.data, fromMe:false}])
         }
-        setSocket(socket)
+        setFileSocket(socket)
     }, [])
 
     const onClickConnect = async (user: User) => {
@@ -115,7 +116,7 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
                         <Loader />
                     </div>
                     : <div className="chat-wrapper">
-                        <Chat name={name} msgs={messages} sock={msgSocket}/>
+                        <Chat name={name} msgs={messages} sock={msgSocket} fileSock={fileSocket}/>
                     </div>
                 }
             </div>

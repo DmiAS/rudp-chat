@@ -6,4 +6,6 @@ export interface User {
 export interface Msg {
     text: string
     fromMe?: boolean
+    isImage?: boolean
+    img?: any
 }

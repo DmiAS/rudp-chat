@@ -9,18 +9,43 @@ type Props = {
 export const ChatMsg: React.FC<Props> = ({ msgs }) => {
     console.log(msgs)
 
+    const addClass = (elem: Msg) => {
+        let res: string = ''
+
+        if (elem.fromMe) {
+            res += "msg reverse"
+        } else {
+            res += "msg"
+        }
+
+        if (elem.isImage) {
+            res += " image"
+        }
+
+        return res
+    }
+
     return (
-        <div>
+        <>
             {msgs.map(elem => {
                 return (
-                    <div className={elem.fromMe ? "msg reverse" : "msg"}>
-                        {/* <div className={elem.fromMe ? "msg-cloud green" : "msg-cloud blue"}>
-                            {elem.text}
-                        </div> */}
-                        <Button style={{minWidth: "160px"}} size="large" variant="outlined" color={elem.fromMe ? "primary" : "inherit"}>{elem.text}</Button>
+                    <div className={addClass(elem)}>
+                        {!elem.isImage ?
+                            <Button
+                                size="large"
+                                variant="outlined"
+                                color={elem.fromMe ? "primary" : "inherit"}
+                                style={{minWidth: "160px"}}
+                            >
+                                {elem.text}
+                            </Button>
+                        :
+                            <img src={elem.img} style={{width: "520px", height: "320px"}} />
+                        }
+
                     </div>
                 )
             })}
-        </div>
+        </>
     )
 }
