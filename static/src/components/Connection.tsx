@@ -20,7 +20,13 @@ export const Connection: React.FC<ConnectionProps> = ({users, isLoading}) => {
         console.log(new_uri)
         let ws = new WebSocket(new_uri)
         ws.onopen = (event) => {
-            ws.send(JSON.stringify({"address": address, "action": "start"}))
+            if (address != "") {
+                ws.send(JSON.stringify({"address": address, "action": "start"}))
+            }
+        }
+        ws.onmessage = (event) => {
+            console.log("messaging")
+            console.log(event.data)
         }
     }, [address])
 

@@ -22,25 +22,40 @@ const (
 
 // handle messages for connecting go clients
 func (s *Server) chatThread(c *websocket.Conn) {
-	var (
-		mt  int
-		msg []byte
-		err error
-	)
+	ch := make(chan []byte, 1)
 	for {
-		if mt, msg, err = c.ReadMessage(); err != nil {
+		select {
+		case msg := <-ch:
+			if err := s.handleChat(msg); err != nil {
+				log.Debug().Err(err).Msg("something in socket")
+				if err := c.WriteJSON(model.ErrResponse{Msg: err.Error()}); err != nil {
+					log.Debug().Err(err).Msg("failure to send json via socket")
+				}
+			}
+		case <-s.cli.GetSignalChan():
+			log.Debug().Msg("received signal")
+			if err := s.manager.StartServer(); err != nil {
+				log.Error().Err(err).Msg("failure to start server")
+				continue
+			}
+			if err := c.WriteMessage(websocket.TextMessage, []byte("ping")); err != nil {
+				log.Error().Err(err).Msg("failure to send ping message to server")
+				continue
+			}
+		}
+	}
+}
+
+func (s *Server) readFromConn(c *websocket.Conn, ch chan []byte) {
+	for {
+		mt, msg, err := c.ReadMessage()
+		if err != nil {
 			log.Debug().Err(err).Msg("read from socket error")
-			break
+			continue
 		}
 		log.Debug().Msgf("receive %d bytes from chat thread", len(msg))
 		log.Debug().Msgf("message  type = %d", mt)
-
-		if err := s.handleChat(msg); err != nil {
-			log.Debug().Err(err).Msg("something in socket")
-			if err := c.WriteJSON(model.ErrResponse{Msg: err.Error()}); err != nil {
-				log.Debug().Err(err).Msg("failure to send json via socket")
-			}
-		}
+		ch <- msg
 	}
 }
 

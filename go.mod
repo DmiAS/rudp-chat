@@ -3,7 +3,7 @@ module chat
 go 1.17
 
 require (
-	github.com/DmiAS/rendezvous v0.1.0
+	github.com/DmiAS/rendezvous v0.1.4
 	github.com/gofiber/fiber/v2 v2.26.0
 	github.com/gofiber/websocket/v2 v2.0.16
 	github.com/rs/zerolog v1.26.1
