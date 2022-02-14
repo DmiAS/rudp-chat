@@ -5,12 +5,12 @@ import {ChatHeader} from './ChatHeader'
 import {ChatMsg} from './ChatMsg'
 
 type Props = {
-    user: User
+    name: string
     msgs: Msg[]
     sock?:WebSocket
 }
 
-export const Chat: React.FC<Props> = ({user, msgs, sock}) => {
+export const Chat: React.FC<Props> = ({name, msgs, sock}) => {
     const [messages, setMessages] = React.useState<Msg[]>([])
 
     const msgHandler = (msg: Msg) => {
@@ -26,7 +26,7 @@ export const Chat: React.FC<Props> = ({user, msgs, sock}) => {
     return (
         <>
             <div className="chat-header">
-                <ChatHeader user={user}/>
+                <ChatHeader name={name}/>
             </div>
 
             <div className="chat-msg">

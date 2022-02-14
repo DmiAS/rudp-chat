@@ -21,6 +21,7 @@ const (
 
 func (s *Server) initRoutes() {
 	// serve html for gui
+	s.app.Static("/files", "/Users/d.antsibor/university/network/course/chat/files")
 	s.app.Static("/", "/Users/d.antsibor/university/network/course/chat/static/build")
 	api := s.app.Group(apiPath).Use(cors.New())
 	{

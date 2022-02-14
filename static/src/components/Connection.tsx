@@ -17,10 +17,11 @@ type ConnectionProps = {
 export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
     const [connected, setConnected] = React.useState(false)
     const [isChatLoading, setIsChatLoading] = React.useState(false)
-    const [chosen, setChosen] = React.useState({name: '', id: -1})
+    // const [chosen, setChosen] = React.useState({name: '', id: -1})
     const [address, setAddress] = React.useState("")
     const [messages, setMessages] = React.useState<Msg[]>([])
     const [msgSocket, setSocket] = React.useState<WebSocket>()
+    const [name, setName] = React.useState<string>("")
 
     useEffect( () => {
         let new_uri = "ws://" + window.location.host + "/ws/chat/thread"
@@ -34,17 +35,33 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
         ws.onmessage = (event) => {
             console.log("messaging")
             console.log(event.data)
+            setName(event.data)
         }
     }, [address])
 
     useEffect(() => {
-        // connect to messages wewbsocket
+        // connect to message websocket
         let new_uri = "ws://" + window.location.host + "/ws/chat/message"
         console.log(new_uri)
         let socket = new WebSocket(new_uri)
         socket.onmessage = (event) => {
             console.log(`message received ${event.data}`)
             setMessages([{text: event.data, fromMe:false}])
+        }
+        setSocket(socket)
+    }, [])
+
+    useEffect(() => {
+        // connect ot files websocket
+        let new_uri = "ws://" + window.location.host + "/ws/chat/files"
+        console.log(new_uri)
+        let socket = new WebSocket(new_uri)
+        socket.onmessage = (event) => {
+
+            const file = axios.get(`/files/${event.data}`) // get file from storage
+            
+            console.log(`received file path = ${event.data}`)
+            // setMessages([{text: event.data, fromMe:false}])
         }
         setSocket(socket)
     }, [])
@@ -59,6 +76,7 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
         }
         setIsChatLoading(false)
         setAddress(resp.data["address"])
+        setName(user.name)
         // setIsChatLoading(false)
         // setTimeout(() => {
         //     setConnected(true)
@@ -70,7 +88,8 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
     const onClickEnd = (user: User) => {
         setTimeout(() => {
             setConnected(false)
-            setChosen({name: '', id: -1})
+            // setChosen({name: '', id: -1})
+            setName("")
         }, 5000)
     }
 
@@ -84,7 +103,7 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
                     {users.map(user => {
                         return (
                             <UserComp user={user} onClickConnect={onClickConnect}
-                                      onClickEnd={onClickEnd} chosen={chosen} connected={connected}/>
+                                      onClickEnd={onClickEnd} connected={connected}/>
                         )
                     })}
                 </div>
@@ -96,7 +115,7 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
                         <Loader />
                     </div>
                     : <div className="chat-wrapper">
-                        <Chat user={chosen} msgs={messages} sock={msgSocket}/>
+                        <Chat name={name} msgs={messages} sock={msgSocket}/>
                     </div>
                 }
             </div>

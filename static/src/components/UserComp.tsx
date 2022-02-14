@@ -7,15 +7,14 @@ interface UserActions {
     user: User
     onClickConnect: (user: User) => void
     onClickEnd: (user: User) => void
-    chosen: User
     connected: boolean
 }
 
-export const UserComp: React.FC<UserActions> = ({ user, onClickConnect, onClickEnd, chosen, connected }) => {
+export const UserComp: React.FC<UserActions> = ({ user, onClickConnect, onClickEnd, connected }) => {
 
-    React.useEffect(() => {
-        console.log(user.id !== chosen.id, chosen)
-    })
+    // React.useEffect(() => {
+    //     console.log(user.id !== chosen.id, chosen)
+    // })
 
     return (
         <Accordion key={user.id} className='user-record'>
@@ -34,7 +33,7 @@ export const UserComp: React.FC<UserActions> = ({ user, onClickConnect, onClickE
             <AccordionDetails className='actions-container'>
                 <div className="actions">
                     <Button disabled={connected} onClick={() => onClickConnect(user)} color="primary" variant="outlined" size="small">Connect</Button>
-                    <Button disabled={!connected || chosen.id !== user.id}  onClick={() => onClickEnd(user)} style={{ color: "#ff0000" }} variant="outlined" size="small">End</Button>
+                    <Button disabled={!connected}  onClick={() => onClickEnd(user)} style={{ color: "#ff0000" }} variant="outlined" size="small">End</Button>
                 </div>
             </AccordionDetails>
         </Accordion>
