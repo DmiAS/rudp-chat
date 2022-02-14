@@ -59,9 +59,8 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
         let socket = new WebSocket(new_uri)
         socket.onmessage = (event) => {
             console.log(event, "!@$$%")
-            const file = axios.get(`/files/${event.data}`) // get file from storage
-
-            console.log(`received file path = ${event.data}`)
+            // const file = axios.get(`/files/${event.data}`) // get file from storage
+            setMessages([{text:"", isImage:true, img: "/files/" + event.data}])
             // setMessages([{text: event.data, fromMe:false}])
         }
         setFileSocket(socket)

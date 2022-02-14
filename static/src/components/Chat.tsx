@@ -33,9 +33,9 @@ export const Chat: React.FC<Props> = ({name, msgs, sock, fileSock}) => {
             reader.readAsDataURL(file);
             reader.onload = function () {
             //me.modelvalue = reader.result;
-                console.log(reader.result);
+            //     console.log(reader.result);
                 const postJSON = {name: file.name, data: reader.result!.slice(String(reader.result).indexOf(',') + 1)}
-                console.log(postJSON.data)
+                // console.log(postJSON.data)
                 fileSock!.send(JSON.stringify(postJSON))
             };
             reader.onerror = function (error) {
