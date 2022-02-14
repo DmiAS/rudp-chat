@@ -74,22 +74,27 @@ func (m *Manager) Disconnect() {
 func (m *Manager) listen() {
 	for {
 		data := <-m.engine.Receive()
+		log.Debug().Msgf("read data %d from manager", len(data))
+
 		packet := &model.Packet{}
 		if err := json.Unmarshal(data, packet); err != nil {
 			log.Error().Err(err).Msgf("failure to unmarshal data")
+			continue
 		}
-		log.Debug().Msgf("received data from engine: %+v", packet)
+
+		// log.Debug().Msgf("received data from engine: %+v", packet)
 		switch {
 		case packet.IsMessage:
 			m.messagesChan <- packet.Data
 		case packet.IsFile:
-			m.filesChan <- packet.Data
+			// sends full data to process files
+			m.filesChan <- data
 		}
 	}
 }
 
 func (m *Manager) SendData(data []byte) {
-	log.Debug().Msgf("senging data %d bytes", len(data))
+	log.Debug().Msgf("sending data %d bytes", len(data))
 	m.engine.Send(data)
 }
 

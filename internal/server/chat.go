@@ -35,6 +35,7 @@ func (s *Server) chatThread(c *websocket.Conn) {
 			}
 		case name := <-s.cli.GetSignalChan():
 			log.Debug().Msg("received signal")
+			s.cli.StopListener()
 			if err := s.manager.StartServer(); err != nil {
 				log.Error().Err(err).Msg("failure to start server")
 				continue
@@ -82,11 +83,13 @@ func (s *Server) handleChat(data []byte) error {
 }
 
 func (s *Server) workWithMessages(c *websocket.Conn) {
-	log.Debug().Msg("starting handler")
+	log.Debug().Msg("starting messages handler")
 	go s.readMessages(c)
 	s.writeMessages(c)
 }
 
 func (s *Server) workWithFiles(c *websocket.Conn) {
-
+	log.Debug().Msg("starting files handler")
+	go s.readFiles(c)
+	s.writeFiles(c)
 }

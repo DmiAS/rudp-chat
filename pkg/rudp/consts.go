@@ -14,5 +14,5 @@ const (
 	sendChanSize = 5
 
 	// buffer size for both type os messages
-	bufferSize = 1024
+	bufferSize = 64000
 )

@@ -30,5 +30,7 @@ func (s *Server) connect(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(model.ErrResponse{Msg: err.Error()})
 	}
 
+	// stopping listener
+	s.cli.StopListener()
 	return ctx.Status(fiber.StatusOK).JSON(model.AddrResponse{Address: addr.String()})
 }
