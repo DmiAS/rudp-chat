@@ -12,13 +12,15 @@ type ConnectionProps = {
 }
 
 //! МОКИ. Тут должно быть получение сообщений из сокета
-const msgs: Msg[] = [{text: "Привет"}, {text: "1234123412341234123412341234", fromMe: true}]
+// const msgs: Msg[] = [{text: "Привет"}, {text: "1234123412341234123412341234", fromMe: true}]
 
 export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
     const [connected, setConnected] = React.useState(false)
     const [isChatLoading, setIsChatLoading] = React.useState(false)
     const [chosen, setChosen] = React.useState({name: '', id: -1})
     const [address, setAddress] = React.useState("")
+    const [messages, setMessages] = React.useState<Msg[]>([])
+    const [msgSocket, setSocket] = React.useState<WebSocket>()
 
     useEffect( () => {
         let new_uri = "ws://" + window.location.host + "/ws/chat/thread"
@@ -34,6 +36,18 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
             console.log(event.data)
         }
     }, [address])
+
+    useEffect(() => {
+        // connect to messages wewbsocket
+        let new_uri = "ws://" + window.location.host + "/ws/chat/message"
+        console.log(new_uri)
+        let socket = new WebSocket(new_uri)
+        socket.onmessage = (event) => {
+            console.log(`message received ${event.data}`)
+            setMessages([{text: event.data, fromMe:false}])
+        }
+        setSocket(socket)
+    }, [])
 
     const onClickConnect = async (user: User) => {
         console.log(user.name)
@@ -82,7 +96,7 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
                         <Loader />
                     </div>
                     : <div className="chat-wrapper">
-                        <Chat user={chosen} msgs={msgs}/>
+                        <Chat user={chosen} msgs={messages} sock={msgSocket}/>
                     </div>
                 }
             </div>

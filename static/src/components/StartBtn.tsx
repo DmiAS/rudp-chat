@@ -15,23 +15,22 @@ export const StartBtn: React.FC<Props> = props => {
     const ref = React.useRef<HTMLInputElement>(null)
 
     const textHandler = async () => {
-        // const value = ref.current!.value
-        // // const result = await axios.post(`http://localhost:8080/api/v1/register/${value}`)
-        // const result = await axios.post(`/api/v1/register/${value}`)
-        // if (result.status !== 200) {
-        //     window.alert(`${result.data.msg}`)
-        //     return
-        // }
+        const value = ref.current!.value
+        // const result = await axios.post(`http://localhost:8080/api/v1/register/${value}`)
+        const result = await axios.post(`/api/v1/register/${value}`)
+        if (result.status !== 200) {
+            window.alert(`${result.data.msg}`)
+            return
+        }
 
-        // // !!! Зачекать потом
-        // const jsonResult = await axios.get<ApiResult>(`http://localhost:8081/api/v1/users/${value}`)
-        // const names = jsonResult.data.names
-        // console.log(names)
+        const jsonResult = await axios.get<ApiResult>(`http://localhost:8081/api/v1/users/${value}`)
+        const names = jsonResult.data.names
+        console.log(names)
 
 
-        // props.namesHandler(names)
+        props.namesHandler(names)
 
-        props.namesHandler(["Dima", "masha", "pasha"])
+        // props.namesHandler(["Dima", "masha", "pasha"])
 
         navigate('/connect')
     }

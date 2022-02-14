@@ -23,6 +23,7 @@ const (
 // handle messages for connecting go clients
 func (s *Server) chatThread(c *websocket.Conn) {
 	ch := make(chan []byte, 1)
+	go s.readFromConn(c, ch)
 	for {
 		select {
 		case msg := <-ch:
@@ -81,20 +82,9 @@ func (s *Server) handleChat(data []byte) error {
 }
 
 func (s *Server) workWithMessages(c *websocket.Conn) {
-	var (
-		mt  int
-		msg []byte
-		err error
-	)
-	for {
-		if mt, msg, err = c.ReadMessage(); err != nil {
-			log.Debug().Err(err).Msg("read from socket error")
-			break
-		}
-		log.Debug().Msgf("receive %d bytes from chat thread", len(msg))
-		log.Debug().Msgf("message  type = %d", mt)
-
-	}
+	log.Debug().Msg("starting handler")
+	go s.readMessages(c)
+	s.writeMessages(c)
 }
 
 func (s *Server) workWithFiles(c *websocket.Conn) {

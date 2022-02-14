@@ -45,6 +45,7 @@ func (m *Manager) StartServer() error {
 		return fmt.Errorf("failure to create rudp server: %s", err)
 	}
 	m.run(srv)
+	log.Debug().Msg("init engine as client")
 	return nil
 }
 
@@ -54,20 +55,14 @@ func (m *Manager) Connect(addr string) error {
 		return fmt.Errorf("failure to create rudp client: %s", err)
 	}
 	m.run(cli)
+	log.Debug().Msg("init engine as client")
 	return nil
 }
 
 func (m *Manager) run(engine Engine) {
 	m.engine = engine
 	go m.listen()
-	go m.spin()
-}
-
-func (m *Manager) spin() {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	m.engine.Start(ctx)
-	<-m.quit
+	go m.engine.Start(context.Background())
 }
 
 func (m *Manager) Disconnect() {
@@ -83,6 +78,7 @@ func (m *Manager) listen() {
 		if err := json.Unmarshal(data, packet); err != nil {
 			log.Error().Err(err).Msgf("failure to unmarshal data")
 		}
+		log.Debug().Msgf("received data from engine: %+v", packet)
 		switch {
 		case packet.IsMessage:
 			m.messagesChan <- packet.Data
@@ -93,6 +89,7 @@ func (m *Manager) listen() {
 }
 
 func (m *Manager) SendData(data []byte) {
+	log.Debug().Msgf("senging data %d bytes", len(data))
 	m.engine.Send(data)
 }
 

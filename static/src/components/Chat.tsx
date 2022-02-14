@@ -1,26 +1,27 @@
-import { AppBar, Box } from '@material-ui/core'
-import { report } from 'process'
-import React, { useEffect } from 'react'
-import { Msg, User } from '../interfaces/core'
-import { ChatFooter } from './ChatFooter'
-import { ChatHeader } from './ChatHeader'
-import { ChatMsg } from './ChatMsg'
+import React from 'react'
+import {Msg, User} from '../interfaces/core'
+import {ChatFooter} from './ChatFooter'
+import {ChatHeader} from './ChatHeader'
+import {ChatMsg} from './ChatMsg'
 
 type Props = {
     user: User
     msgs: Msg[]
+    sock?:WebSocket
 }
 
-export const Chat: React.FC<Props> = ({ user, msgs }) => {
+export const Chat: React.FC<Props> = ({user, msgs, sock}) => {
     const [messages, setMessages] = React.useState<Msg[]>([])
 
     const msgHandler = (msg: Msg) => {
+        sock!.send(msg.text)
         setMessages(prev => [...prev, msg])
     }
 
     React.useEffect(() => {
+        // console.log(`in use ref with messages = ${msgs}`)
         setMessages(prev => [...prev, ...msgs])
-    }, [])
+    }, [msgs])
 
     return (
         <>
