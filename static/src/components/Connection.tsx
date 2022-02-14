@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import { User } from "../interfaces/core"
+import { Msg, User } from "../interfaces/core"
 import { Loader } from "./Loader"
 import { UserComp } from "./UserComp"
 import axios from "axios"
@@ -9,6 +9,8 @@ type ConnectionProps = {
     users: User[]
     isLoading: boolean
 }
+
+const msgs: Msg[] = [{text: "Привет"}, {text: "1234123412341234123412341234", fromMe: true}]
 
 export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
     const [connected, setConnected] = React.useState(false)
@@ -72,7 +74,7 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
                         <Loader />
                     </div>
                     : <div className="chat-wrapper">
-                        <Chat />
+                        <Chat user={chosen} msgs={msgs}/>
                     </div>
                 }
             </div>
