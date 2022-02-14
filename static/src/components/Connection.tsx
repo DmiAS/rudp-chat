@@ -1,9 +1,10 @@
-import React, { useEffect } from "react"
+import React, {useEffect} from "react"
 import { Msg, User } from "../interfaces/core"
-import { Loader } from "./Loader"
-import { UserComp } from "./UserComp"
+import {Loader} from "./Loader"
+import {UserComp} from "./UserComp"
 import axios from "axios"
 import { Chat } from "./Chat"
+
 
 type ConnectionProps = {
     users: User[]
@@ -15,15 +16,21 @@ const msgs: Msg[] = [{text: "Привет"}, {text: "123412341234123412341234123
 export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
     const [connected, setConnected] = React.useState(false)
     const [isChatLoading, setIsChatLoading] = React.useState(false)
-    const [chosen, setChosen] = React.useState({ name: '', id: -1 })
+    const [chosen, setChosen] = React.useState({name: '', id: -1})
     const [address, setAddress] = React.useState("")
 
-    useEffect(() => {
+    useEffect( () => {
         let new_uri = "ws://" + window.location.host + "/ws/chat/thread"
         console.log(new_uri)
         let ws = new WebSocket(new_uri)
         ws.onopen = (event) => {
-            ws.send(JSON.stringify({ "address": address, "action": "start" }))
+            if (address != "") {
+                ws.send(JSON.stringify({"address": address, "action": "start"}))
+            }
+        }
+        ws.onmessage = (event) => {
+            console.log("messaging")
+            console.log(event.data)
         }
     }, [address])
 
@@ -48,13 +55,13 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
     const onClickEnd = (user: User) => {
         setTimeout(() => {
             setConnected(false)
-            setChosen({ name: '', id: -1 })
-        }, 2000)
+            setChosen({name: '', id: -1})
+        }, 5000)
     }
 
 
     return isLoading ? (
-        <Loader />
+        <Loader/>
     ) : (
         <div className="main-view-container">
             <div className="users-container">
@@ -62,7 +69,7 @@ export const Connection: React.FC<ConnectionProps> = ({ users, isLoading }) => {
                     {users.map(user => {
                         return (
                             <UserComp user={user} onClickConnect={onClickConnect}
-                                onClickEnd={onClickEnd} chosen={chosen} connected={connected} />
+                                      onClickEnd={onClickEnd} chosen={chosen} connected={connected}/>
                         )
                     })}
                 </div>
